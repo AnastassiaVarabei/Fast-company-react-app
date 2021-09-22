@@ -4,43 +4,45 @@ import api from "../api";
 const Users = () => {
   const [users, setUsers] = useState(api.users.fetchAll());
 
-  const [count, setCount] = useState(100);
-
-  const formCount = () => {
-    return count === 0 ? "Ноль" : count;
+  const getButtonClasses = (value) => {
+    let classes = "badge m-2 bg-";
+    if (value === 0) {
+      return (classes += "danger");
+    }
+    if (value > 0) {
+      return (classes += "primary");
+    }
+    return (classes += value);
   };
 
-  const textForButton = (value) => {
-    value = Math.abs(value) % 100;
-    let count = value % 10;
-    if (count > 10 && count < 20) {
-      return "человек тусанет с тобой сегодня";
+  const handleDelete = (userId) => {
+    setUsers(users.filter((users) => users._id !== userId.target.id));
+  };
+
+  const renderPhrase = (number) => {
+    number = Math.abs(number) % 100;
+    let num = number % 10;
+    if (num > 10 || num < 20) {
+      return `${users.length} человек тусанет с тобой сегодня`;
     }
-    if (count > 4 && count < 10) {
-      return "человек тусанет с тобой сегодня";
+    if (num > 5 || num < 10) {
+      return `${users.length} человек тусанет с тобой сегодня`;
     }
-    if (count > 1 && count < 5) {
-      return "человека тусанет с тобой сегодня";
+    if (num > 1 || num < 5) {
+      return `${users.length} человека тусанут с тобой сегодня`;
     }
-    if (count === 1) {
-      return "человек тусанет с тобой сегодня";
+    if (num === 1) {
+      return `${users.length} человек тусанет с тобой сегодня`;
     }
-    if (count === 0) {
+    if (number === 0) {
       return "Никто с тобой не тусанет";
     }
   };
-  const getButtonclasses = () => {
-    let classes = "badge m-2 bg-";
-    classes += count === 0 ? "danger" : "primary";
-    return classes;
-  };
-  // const handleDelete = (userId) => {};
-  // const renderPhrase = (number) => {};
   return (
     <>
-      <button className={getButtonclasses()}>
-        {formCount()} {textForButton(count)}
-      </button>
+      <span className={getButtonClasses(users.length)}>
+        {renderPhrase(users.length)}
+      </span>
       <table class="table">
         <thead>
           <tr>
@@ -53,16 +55,30 @@ const Users = () => {
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">1</th>
-            <td>Mark</td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td>2.5/5</td>
-            <td>
-              <button className="btn btn-danger btn-sm">delete</button>
-            </td>
-          </tr>
+          {users.map((user) => (
+            <tr>
+              <th scope="row">{user.name}</th>
+              <td>
+                {user.qualities.map((quality) => (
+                  <span className={getButtonClasses(quality.color)}>
+                    {quality.name}
+                  </span>
+                ))}
+              </td>
+              <td>{user.profession.name}</td>
+              <td>{user.completedMeetings}</td>
+              <td>{user.rate}</td>
+              <td>
+                <button
+                  id={user._id}
+                  onClick={handleDelete}
+                  className="btn btn-danger btn-sm"
+                >
+                  delete
+                </button>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
     </>

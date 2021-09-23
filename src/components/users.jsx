@@ -15,26 +15,30 @@ const Users = () => {
     return (classes += value);
   };
 
+  const showTable = (value) => {
+    let classes = "table table-hover";
+    if (!value) {
+      return (classes += " d-none");
+    }
+    return classes;
+  };
+
   const handleDelete = (userId) => {
     setUsers(users.filter((users) => users._id !== userId.target.id));
   };
 
   const renderPhrase = (number) => {
-    number = Math.abs(number) % 100;
-    let num = number % 10;
-    if (num > 10 || num < 20) {
-      return `${users.length} человек тусанет с тобой сегодня`;
-    }
-    if (num > 5 || num < 10) {
-      return `${users.length} человек тусанет с тобой сегодня`;
-    }
-    if (num > 1 || num < 5) {
+    const lastNumber = Number(number.toString().slice(-1));
+    if ([2, 3, 4].indexOf(lastNumber) >= 0) {
       return `${users.length} человека тусанут с тобой сегодня`;
     }
-    if (num === 1) {
+    if (number > 4 && number < 15) {
       return `${users.length} человек тусанет с тобой сегодня`;
     }
-    if (number === 0) {
+    if (lastNumber === 1) {
+      return `${users.length} человек тусанет с тобой сегодня`;
+    }
+    if (lastNumber === 0) {
       return "Никто с тобой не тусанет";
     }
   };
@@ -43,7 +47,7 @@ const Users = () => {
       <span className={getButtonClasses(users.length)}>
         {renderPhrase(users.length)}
       </span>
-      <table class="table">
+      <table className={showTable(users.length)}>
         <thead>
           <tr>
             <th scope="col">Имя</th>
@@ -56,18 +60,27 @@ const Users = () => {
         </thead>
         <tbody>
           {users.map((user) => (
-            <tr>
-              <th scope="row">{user.name}</th>
+            <tr key={user._id}>
+              <th key={user._id + user.name} scope="row">
+                {user.name}
+              </th>
               <td>
                 {user.qualities.map((quality) => (
-                  <span className={getButtonClasses(quality.color)}>
+                  <span
+                    key={user._id + quality.name}
+                    className={getButtonClasses(quality.color)}
+                  >
                     {quality.name}
                   </span>
                 ))}
               </td>
-              <td>{user.profession.name}</td>
-              <td>{user.completedMeetings}</td>
-              <td>{user.rate}</td>
+              <td key={user._id + user.profession.name}>
+                {user.profession.name}
+              </td>
+              <td key={user._id + user.completedMeetings}>
+                {user.completedMeetings}
+              </td>
+              <td key={user._id + user.rate}>{user.rate}</td>
               <td>
                 <button
                   id={user._id}
